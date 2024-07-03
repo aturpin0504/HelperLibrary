@@ -25,9 +25,14 @@ namespace HelperLibrary
             var username = Environment.UserName;
             var hostname = Environment.MachineName;
             var currentDir = Environment.CurrentDirectory;
+            // create a logs directory within the current directory if it doesn't exist
+            if (!Directory.Exists(Path.Combine(currentDir, "Logs")))
+            {
+                Directory.CreateDirectory(Path.Combine(currentDir, "Logs"));
+            }
             string logName = $"Log-{appName}-{mode}-{username}-{hostname}-{version}-{currentDateTime}.{extension}";
             powerShell.Dispose();
-            return Path.Combine(currentDir, logName);
+            return Path.Combine($"{currentDir}\\Logs", logName);
         }
 
         public static void CreateLogFile(string logPath)
@@ -132,10 +137,11 @@ namespace HelperLibrary
 
         private static string EscapeCsvField(string field)
         {
-            if (field == null) return string.Empty;
+            if (field == null || field == string.Empty) return string.Empty;
             if (field.Contains(",") || field.Contains("\"") || field.Contains("\n"))
             {
                 field = field.Replace("\"", "\"\"");
+                field = field.Replace("\r\n", string.Empty);
                 field = $"\"{field}\"";
             }
             return field;
@@ -144,10 +150,10 @@ namespace HelperLibrary
         public static void ExportProcessResultsToCsv(List<ProcessResult> processResults, string logPath)
         {
             var csv = new StringBuilder();
-            csv.AppendLine("PC Address,Exit Code,Standard Output,Standard Error,Source Path,Destination Path,Time Taken");
+            csv.AppendLine("PC Address,Exit Code,Standard Output,Standard Error");
             foreach (var processResult in processResults)
             {
-                csv.AppendLine($"{EscapeCsvField(processResult.PCAddress)},{processResult.ExitCode},{EscapeCsvField(processResult.StandardOutput)},{EscapeCsvField(processResult.StandardError)},{EscapeCsvField(processResult.SourcePath)},{EscapeCsvField(processResult.DestinationPath)}");
+                csv.AppendLine($"{EscapeCsvField(processResult.PCAddress)},{processResult.ExitCode},{EscapeCsvField(processResult.StandardOutput)},{EscapeCsvField(processResult.StandardError)}");
             }
             File.WriteAllText(logPath, csv.ToString());
         }
@@ -155,7 +161,7 @@ namespace HelperLibrary
         public static void AddTimeTakenToCsv(string logPath, TimeSpan timeTaken)
         {
             var csv = new StringBuilder();
-            csv.AppendLine($"Time Taken:,{FormatTimeTaken(timeTaken)}");
+            csv.AppendLine($"Time Taken: {FormatTimeTaken(timeTaken)}");
             File.AppendAllText(logPath, csv.ToString());
         }
 
@@ -165,9 +171,8 @@ namespace HelperLibrary
                    (powerShell.IsValidADComputer(pc) && powerShell.IsPCOnline(pc));
         }
 
-        public static void LogAndPrint(string logPath, string message)
+        public static void PrinStatus(string message)
         {
-            AddLogEntry(logPath, message);
             Console.WriteLine(message);
         }
     }

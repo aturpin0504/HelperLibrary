@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 namespace HelperLibrary
 {
-    internal static class ProcessExtensions
+    public static class ProcessExtensions
     {
         private static ProcessResult RunProcessInternal(this Process process, string fileName, string arguments, string pcAddress = "localhost", bool isRemote = false)
         {

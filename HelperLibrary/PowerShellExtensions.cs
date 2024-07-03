@@ -8,7 +8,7 @@ using System.Management.Automation;
 
 namespace HelperLibrary
 {
-    internal static class PowerShellExtensions
+    public static class PowerShellExtensions
     {
         #region Invoke and Clear
 
