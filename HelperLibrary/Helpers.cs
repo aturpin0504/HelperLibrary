@@ -130,10 +130,8 @@ namespace HelperLibrary
             ConsoleTable.From(userSessions).Write();
         }
 
-        private static string FormatTimeTaken(TimeSpan timeTaken)
-        {
-            return timeTaken.TotalSeconds < 1 ? "Less than a second" : timeTaken.ToString(@"hh\:mm\:ss");
-        }
+        private static string FormatTimeTaken(TimeSpan timeTaken) =>
+            timeTaken.TotalSeconds < 1 ? "Less than a second" : timeTaken.ToString(@"hh\:mm\:ss");
 
         private static string EscapeCsvField(string field)
         {
